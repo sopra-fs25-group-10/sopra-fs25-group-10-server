@@ -51,7 +51,6 @@ public class Game implements Serializable {
     this.gameId = gameId;
   }
 
-  //Don't use these two methods 
   //add player
   public void addPlayer(User player) {
     players.add(player);
