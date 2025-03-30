@@ -1,14 +1,16 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
+import java.util.List;
+
 public class GamePostDTO {
 
-  private String username;
+    private List<String> players;        
 
-  public String getUsername() {
-    return username;
-  }
+    public List<String> getPlayers() {
+        return players;
+    }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
+    public void setPlayers(List<String> players) {
+        this.players = players;
+    }
 }

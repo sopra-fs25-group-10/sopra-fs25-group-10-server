@@ -18,40 +18,21 @@ import java.util.List;
  * The controller will receive the request and delegate the execution to the
  * UserService and finally return the result.
  */
-@RestController
 public class GameController {
 
   private final GameService gameService;
 
   GameController(GameService gameService) {
-    this.gameService = gameService;
+      this.gameService = gameService;
   }
 
-  // @GetMapping("/users")
-  // @ResponseStatus(HttpStatus.OK)
-  // @ResponseBody
-  // public List<UserGetDTO> getAllUsers() {
-  //   // fetch all users in the internal representation
-  //   List<User> users = userService.getUsers();
-  //   List<UserGetDTO> userGetDTOs = new ArrayList<>();
+  @PostMapping("/games")
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public GameGetDTO createGame(@RequestBody GamePostDTO gamePostDTO) {
+      
+      Game createdGame = gameService.createGame(gamePostDTO);
 
-  //   // convert each user to the API representation
-  //   for (User user : users) {
-  //     userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
-  //   }
-  //   return userGetDTOs;
-  // }
-
-  // @PostMapping("/users")
-  // @ResponseStatus(HttpStatus.CREATED)
-  // @ResponseBody
-  // public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO) {
-  //   // convert API user to internal representation
-  //   User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-
-  //   // create user
-  //   User createdUser = userService.createUser(userInput);
-  //   // convert internal representation of user back to API
-  //   return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
-  // }
+      return DTOMapper.INSTANCE.convertEntityToGameGetDTO(createdGame);
+  }
 }
