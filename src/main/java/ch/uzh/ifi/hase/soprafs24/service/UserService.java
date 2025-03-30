@@ -52,56 +52,6 @@ public class UserService {
     return newUser;
   }
 
-  public void changePassword(Long userId, String currentPassword, String newPassword) {
-    // search user by ID
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-    // check if current password is correct
-    if (!user.getPassword().equals(currentPassword)) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect current password");
-    }
-
-    // Check if new password is valid
-    if (newPassword == null || newPassword.trim().isEmpty()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password must not be empty");
-    }
-
-    // update password
-    user.setPassword(newPassword);
-    userRepository.save(user);
-  }
-
-  public User login(User loginUser) {
-    User userInDB = userRepository.findByUsername(loginUser.getUsername());
-    if (userInDB == null || !userInDB.getPassword().equals(loginUser.getPassword())) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
-    }
-
-    userInDB.setStatus(UserStatus.ONLINE);
-    userInDB.setToken(UUID.randomUUID().toString());
-    userRepository.save(userInDB);
-    return userInDB;
-  }
-
-  public void logout(User user) {
-    User userInDB = userRepository.findByToken(user.getToken());
-    if (userInDB == null) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-    }
-
-    userInDB.setStatus(UserStatus.OFFLINE);
-    userRepository.save(userInDB);
-  }
-
-  public User userAuthenticate(User authenticateUser) {
-    User userVerified = userRepository.findByToken(authenticateUser.getToken());
-    if (userVerified == null) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Authenticated");
-    }
-    return userVerified;
-  }
-
   /**
    * This is a helper method that will check the uniqueness criteria of the
    * username and the name
