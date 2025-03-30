@@ -28,6 +28,7 @@ public class UserRepositoryIntegrationTest {
     User user = new User();
     user.setName("Firstname Lastname");
     user.setUsername("firstname@lastname");
+    user.setPassword("testPassword"); 
     user.setStatus(UserStatus.OFFLINE);
     user.setToken("1");
 
@@ -38,7 +39,7 @@ public class UserRepositoryIntegrationTest {
     User found = userRepository.findByName(user.getName());
 
     // then
-    assertNotNull(found.getId());
+    assertNotNull(found.getUserId());
     assertEquals(found.getName(), user.getName());
     assertEquals(found.getUsername(), user.getUsername());
     assertEquals(found.getToken(), user.getToken());
@@ -51,6 +52,7 @@ public class UserRepositoryIntegrationTest {
     User user = new User();
     user.setUsername("firstname@lastname");
     user.setName("name");
+    user.setPassword("dummyPassword");
     user.setStatus(UserStatus.OFFLINE);
     user.setToken("1");
 
@@ -61,7 +63,7 @@ public class UserRepositoryIntegrationTest {
     User found = userRepository.findByToken(user.getToken());
 
     // then
-    assertNotNull(found.getId());
+    assertNotNull(found.getUserId());
     assertEquals(found.getUsername(), user.getUsername());
     assertEquals(found.getToken(), user.getToken());
     assertEquals(found.getStatus(), user.getStatus());
@@ -73,6 +75,7 @@ public class UserRepositoryIntegrationTest {
     User user = new User();
     user.setUsername("firstname@lastname");
     user.setName("name");
+    user.setPassword("dummyPassword");
     user.setStatus(UserStatus.OFFLINE);
     user.setToken("1");
 

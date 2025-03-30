@@ -41,6 +41,7 @@ public class UserServiceIntegrationTest {
     testUser = new User();
     testUser.setUsername("testUsername");
     testUser.setName("testName");
+    testUser.setPassword("testPassword");
     testUser.setStatus(UserStatus.OFFLINE);
     testUser.setToken(UUID.randomUUID().toString());
     userRepository.save(testUser);
@@ -54,13 +55,14 @@ public class UserServiceIntegrationTest {
     // given
     testUser.setUsername("testValidUsername");
     testUser.setName("testValidName");
+    testUser.setPassword("testPassword"); 
     testUser.setToken(UUID.randomUUID().toString());
 
     // when
     User createdUser = userService.createUser(testUser);
 
     // then
-    assertEquals(testUser.getId(), createdUser.getId());
+    assertEquals(testUser.getUserId(), createdUser.getUserId());
     assertEquals(testUser.getUsername(), createdUser.getUsername());
     assertNotNull(createdUser.getToken());
     assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
@@ -74,6 +76,8 @@ public class UserServiceIntegrationTest {
     // change the name but forget about the username
     testUser2.setUsername("testUsername");
     testUser2.setName("testName2");
+    testUser2.setPassword("testPassword"); 
+    testUser2.setToken(UUID.randomUUID().toString());
 
     // check that an error is thrown
     assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser2));

@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import java.util.Optional;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
@@ -32,7 +33,7 @@ public class UserServiceTest {
 
     // given
     testUser = new User();
-    testUser.setId(1L);
+    testUser.setUserId(1L);
     testUser.setName("testName");
     testUser.setUsername("testUsername");
 
@@ -50,7 +51,7 @@ public class UserServiceTest {
     // then
     Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
 
-    assertEquals(testUser.getId(), createdUser.getId());
+    assertEquals(testUser.getUserId(), createdUser.getUserId());
     assertEquals(testUser.getName(), createdUser.getName());
     assertEquals(testUser.getUsername(), createdUser.getUsername());
     assertNotNull(createdUser.getToken());
@@ -86,20 +87,61 @@ public class UserServiceTest {
   }
 
   @Test
-  public void userAuthenticate_validToken_success() {
-    // given
-    testUser.setToken(UUID.randomUUID().toString());
-    testUser.setStatus(UserStatus.ONLINE);
-    Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
+  public void changePassword_validInputs_success() {
+      // given: a user with existing password
+      testUser.setPassword("oldPassword");
+      Mockito.when(userRepository.findByUserId(testUser.getUserId())).thenReturn(testUser);
+  
+      // when: user changes password with correct current password
+      userService.changePassword(testUser.getUserId(), "oldPassword", "newPassword123");
+  
+      // then: password should be updated and saved
+      assertEquals("newPassword123", testUser.getPassword());
+      Mockito.verify(userRepository).save(testUser);
+  }
 
-    // when
-    User freshUser = new User();
-    freshUser.setUsername("testUsername");
-    freshUser.setToken(testUser.getToken());
-    User user = userService.userAuthenticate(freshUser);
+  @Test
+  public void changePassword_incorrectCurrentPassword_throwsException() {
+      // given: current password is incorrect
+      testUser.setPassword("correctPassword");
+      Mockito.when(userRepository.findByUserId(testUser.getUserId())).thenReturn(testUser);
+  
+      // when + then: expect 400 BAD_REQUEST
+      ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+          userService.changePassword(testUser.getUserId(), "wrongPassword", "newPassword")
+      );
+  
+      assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+      assertTrue(exception.getReason().contains("Incorrect current password"));
+  }
 
-    // then
-    assertNotNull(user);
+  @Test
+  public void changePassword_emptyNewPassword_throwsException() {
+      // given: new password is empty
+      testUser.setPassword("correctPassword");
+      Mockito.when(userRepository.findByUserId(testUser.getUserId())).thenReturn(testUser);
+  
+      // when + then: expect 400 BAD_REQUEST
+      ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+          userService.changePassword(testUser.getUserId(), "correctPassword", "")
+      );
+  
+      assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+      assertTrue(exception.getReason().contains("New password must not be empty"));
+  }
+
+  @Test
+  public void changePassword_userNotFound_throwsException() {
+      // given: repository returns empty
+      Mockito.when(userRepository.findById(999L)).thenReturn(Optional.empty());
+  
+      // when + then: expect 404 NOT_FOUND
+      ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->
+          userService.changePassword(999L, "any", "new")
+      );
+  
+      assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+      assertTrue(exception.getReason().contains("User not found"));
   }
 
   @Test
