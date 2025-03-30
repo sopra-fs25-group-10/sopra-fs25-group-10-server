@@ -10,7 +10,7 @@ public class GamePostDTO {
         return players;
     }
 
-    public void setUsernames(List<String> players) {
+    public void setPlayers(List<String> players) {
         this.players = players;
     }
 }
